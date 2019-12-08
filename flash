@@ -482,6 +482,18 @@ case "${OSTYPE}" in
     ;;
 esac
 
+add_datetime() {
+  # args: $1: full path name of `user-data` file on ssd
+  # get current UTC date/time
+  current_datetime=$(LANG=C date -u)
+
+  sed_i -e \
+  "/^bootcmd/a\\
+\ \ - [ cloud-init-per, once, sdate_msg, echo, \"Setting initial date/time to: $current_datetime\" ]" \
+ -e "/^bootcmd/a\\
+\ \ - [ cloud-init-per, once, sdate, date, -s, \"$current_datetime\" ]" "$1"
+}
+
 if endswith Microsoft "$(uname -r)"; then
   echo This script does not work in WSL.
   exit 11
